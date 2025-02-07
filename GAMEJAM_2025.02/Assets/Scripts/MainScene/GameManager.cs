@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]    private CanvasManager _canvasManager;
+    [SerializeField] private CanvasManager _canvasManager;
     [SerializeField] private GameObject _player;
     [SerializeField] private GameObject _paperBulletPrefab;
     [SerializeField] private Transform _shootPoint; // Position to spawn bullets
+    [SerializeField] private GameObject _firstLevelGameObject;
     [SerializeField] private float _minShootPower = 20f;
     [SerializeField] private float _maxShootPower = 100f;
     [SerializeField] private float _powerChargeSpeed = 10f;
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviour
     private bool _isChargingPower;
     [SerializeField]    private float _currentShootPower;
 
-    [SerializeField] private bool _firstTriggerIsEnabled;
+    public bool _firstTriggerIsEnabled;
    /* [SerializeField] private bool _secondTriggerIsEnabled;
     [SerializeField] private bool _thirdTriggerIsEnabled;*/
     [SerializeField] private bool _isPlayingFirstMiniGame;
@@ -39,6 +40,7 @@ public class GameManager : MonoBehaviour
         _PaperBallsDestroyed = 0;
         _isChargingPower = false;
         SunAquired = false;
+        _firstLevelGameObject.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -60,6 +62,11 @@ public class GameManager : MonoBehaviour
             {
                 _isPlayingFirstMiniGame = false;
                 _player.GetComponent<MainPlayer>().EnableMovement();
+                _firstLevelGameObject.gameObject.SetActive(true);
+                //Destroy gameObject with tag Bordel
+                Debug.Log("FirstLevel");
+                DestroyObjectsWithTag("Bordel1");
+                _firstTriggerIsEnabled = false;
 
             }
         }
@@ -150,4 +157,17 @@ public class GameManager : MonoBehaviour
         _PaperBallsDestroyed++;
         Debug.Log("Ball hit");
     }
+
+    private void DestroyObjectsWithTag(string tag)
+{
+    Debug.Log("Here");
+    GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
+    foreach (GameObject obj in objects)
+    {
+        Destroy(obj);
+    }
+    Debug.Log("Destroyed all objects with tag: " + tag);
+}
+
+
 }

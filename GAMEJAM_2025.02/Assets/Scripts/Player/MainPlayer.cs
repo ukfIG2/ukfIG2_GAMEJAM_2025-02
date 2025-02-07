@@ -75,11 +75,14 @@ public class MainPlayer : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
+        //Debug.Log(other.name);
         if (other.CompareTag("FirstLevelTrigger") && _canvasManager != null)
         {
+            if(_gameManager._firstTriggerIsEnabled)
+            {
             _canvasManager.ShowFirstTriggerMessage();
             _gameManager.FirstTriggerMessageIsShown = true;
+            }
         }
     }
 
@@ -101,5 +104,9 @@ public class MainPlayer : MonoBehaviour
     public void EnableMovement()
     {
         _movementEnabled = true;
+        
+        // Reset rotation to (0,0,0) while keeping position
+        rb.rotation = Quaternion.Euler(0f, 0f, 0f);
     }
+
 }
