@@ -36,8 +36,7 @@ public class MainPlayer : MonoBehaviour
 
     void Update()
     {
-        if(_movementEnabled)
-        {
+        
             // Mouse Look
             float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
             float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -47,7 +46,7 @@ public class MainPlayer : MonoBehaviour
 
             cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f); // Camera up/down
             transform.Rotate(Vector3.up * mouseX); // Player body left/right
-        }
+        
         
     }
 

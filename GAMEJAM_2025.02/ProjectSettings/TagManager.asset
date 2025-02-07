@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - FirstLevelTrigger
+  - TargetToHit
+  - GameManager
+  - Churge
+  - Bear
+  - Sun
   layers:
   - Default
   - TransparentFX
