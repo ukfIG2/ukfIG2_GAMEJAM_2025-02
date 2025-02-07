@@ -20,5 +20,6 @@ public class MainMenuScript : MonoBehaviour
     public void StartGameClick()
     {
         SceneManager.LoadScene("MainScene");
+        Debug.Log("StartGameClick");
     }
 }
