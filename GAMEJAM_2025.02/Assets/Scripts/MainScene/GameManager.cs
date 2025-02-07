@@ -18,8 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]    private float _currentShootPower;
 
     [SerializeField] private bool _firstTriggerIsEnabled;
-    [SerializeField] private bool _secondTriggerIsEnabled;
-    [SerializeField] private bool _thirdTriggerIsEnabled;
+   /* [SerializeField] private bool _secondTriggerIsEnabled;
+    [SerializeField] private bool _thirdTriggerIsEnabled;*/
     [SerializeField] private bool _isPlayingFirstMiniGame;
 
     public bool FirstTriggerMessageIsShown;
@@ -33,8 +33,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _firstTriggerIsEnabled = true;
-        _secondTriggerIsEnabled = true;
-        _thirdTriggerIsEnabled = true;
+       /* _secondTriggerIsEnabled = true;
+        _thirdTriggerIsEnabled = true;*/                                                
         _isPlayingFirstMiniGame = false;
         _PaperBallsDestroyed = 0;
         _isChargingPower = false;

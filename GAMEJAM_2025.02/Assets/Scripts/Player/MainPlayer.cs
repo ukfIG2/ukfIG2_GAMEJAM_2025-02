@@ -8,23 +8,19 @@ public class MainPlayer : MonoBehaviour
     [SerializeField] private bool _movementEnabled;
     public float moveSpeed = 100f;
     public float mouseSensitivity = 100f;
-    private float xRotation = 0f;
 
     public Transform cameraTransform;
     private Rigidbody rb;
-    private bool isGrounded;
 
     [SerializeField] private GameObject _canvas;
     private CanvasManager _canvasManager;
 
+    private float xRotation = 0f;
+
     private void Awake()
     {
         _movementEnabled = true;
-    }
 
-    void Start()
-    {
-        Cursor.lockState = CursorLockMode.Locked; // Lock cursor
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true; // Prevent unwanted rotations
 
@@ -34,42 +30,56 @@ public class MainPlayer : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.Locked; // Lock cursor
+    }
+
     void Update()
     {
-        
-            // Mouse Look
-            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-
-            xRotation -= mouseY;
-            xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Limit camera rotation
-
-            cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f); // Camera up/down
-            transform.Rotate(Vector3.up * mouseX); // Player body left/right
-        
-        
+        HandleMouseLook();
     }
 
     void FixedUpdate()
     {
-        if(_movementEnabled)
+        if (_movementEnabled)
         {
-            // Movement
-            float x = Input.GetAxis("Horizontal");
-            float z = Input.GetAxis("Vertical");
-
-            Vector3 move = transform.right * x + transform.forward * z;
-            rb.MovePosition(rb.position + move * moveSpeed * Time.fixedDeltaTime);
+            HandleMovement();
         }
+    }
+
+    private void HandleMouseLook()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+        // Rotate player body left/right
+        rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, mouseX, 0f));
+
+        // Rotate camera up/down (clamped)
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, -90f, 90f);
+        cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+    }
+
+    private void HandleMovement()
+    {
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 move = transform.right * x + transform.forward * z;
+        Vector3 velocity = move * moveSpeed;
+        velocity.y = rb.velocity.y; // Preserve gravity effect
+        rb.velocity = velocity;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        //Debug.Log(other.name);
+        Debug.Log(other.name);
         if (other.CompareTag("FirstLevelTrigger") && _canvasManager != null)
         {
             _canvasManager.ShowFirstTriggerMessage();
-            _gameManager.FirstTriggerMessageIsShown = true; 
+            _gameManager.FirstTriggerMessageIsShown = true;
         }
     }
 
@@ -78,14 +88,14 @@ public class MainPlayer : MonoBehaviour
         if (other.CompareTag("FirstLevelTrigger") && _canvasManager != null)
         {
             _canvasManager.HideFirstTriggerMessage();
-            _gameManager.FirstTriggerMessageIsShown = false; 
-
+            _gameManager.FirstTriggerMessageIsShown = false;
         }
     }
 
     public void DisableMovement()
     {
         _movementEnabled = false;
+        rb.velocity = Vector3.zero; // Stop movement when disabled
     }
 
     public void EnableMovement()
