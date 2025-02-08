@@ -21,8 +21,10 @@ public class GameManager : MonoBehaviour
     
     ///002
     [SerializeField] private GameObject _firstMiniGamePlayerPosition;
-    [SerializeField] private GameObject _TrashCan;
+    [SerializeField] private GameObject _trashCan;
+    [SerializeField] private GameObject _player;
     ///002    
+    
     
     //Start before creating the game
     void Awake()
@@ -51,6 +53,8 @@ public class GameManager : MonoBehaviour
         if(_mainDoor == null) {Debug.LogWarning("_mainDoor empty, FIX NOW!!!"); _somethingIsMissing = true;}
         if(_audioSource == null) {Debug.LogWarning("_audioSource empty, FIX NOW!!!"); _somethingIsMissing = true;}
         if(_001_IntroSound == null) {Debug.LogWarning("_001_IntroSound empty, FIX NOW!!!"); _somethingIsMissing = true;}
+        if(_trashCan == null) {Debug.LogWarning("_trashCan empty, FIX NOW!!!"); _somethingIsMissing = true;}
+        if(_player == null) {Debug.LogWarning("_player empty, FIX NOW"); _somethingIsMissing = true;}
         if(_somethingIsMissing) {Application.Quit();}
         ///Checking if i have everithing set 
 
@@ -98,7 +102,21 @@ public class GameManager : MonoBehaviour
     private void _002_PlayFirstMinigame()
     {
         Debug.Log("First Minigame Shown");
-        _canvasManager.DisableEventTrigger1(); _canvasManager.Hide_002_1_EventTriggerMessage();
-    }   
+        _canvasManager.DisableEventTrigger1(); 
+        _canvasManager.Hide_002_1_EventTriggerMessage();
+
+        // Move the player to the designated minigame start position
+        _player.transform.position = _firstMiniGamePlayerPosition.transform.position;
+
+        // Rotate player to face the trash can
+        Vector3 targetPosition = _trashCan.transform.position;
+        Vector3 direction = targetPosition - _player.transform.position;
+        _player.transform.LookAt(targetPosition);
+
+        // Ensure the player enters rotation mode (assuming ToggleMode switches between movement and rotation)
+        _player.gameObject.SendMessage("ToggleMode");
+
+    }
+
      /// 002
 }

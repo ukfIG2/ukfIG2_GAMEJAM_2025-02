@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 using UnityEngine.Android;
 
 public class PlayerController : MonoBehaviour
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
         {
             UnlockCursor();
         }*/
-    }   
+ /*   }   
 
     void MovePlayer()
     {
@@ -129,4 +129,166 @@ public class PlayerController : MonoBehaviour
     }
 
 
+}
+*/
+
+using UnityEngine;
+using UnityEngine.Android;
+
+public class PlayerController : MonoBehaviour
+{
+    private bool _somethingIsMissing;
+    [SerializeField]    CanvasManager _canvasManager;
+    private const float MoveSpeed = 1f;
+    private const float MouseSensitivity = 1f;
+    private const float Gravity = -9.81f;
+
+    private CharacterController _controller;
+    private Vector3 _velocity;
+    private float _rotationX = 0f;
+
+    private bool canRotate = true; // Controls whether the player can rotate the camera
+    private bool isRotationMode = false; // Toggle between movement and rotation modes
+
+    [SerializeField] private Transform cameraTransform;  // Assign the child camera in the Inspector
+
+    private void Awake()
+    {
+        _controller = GetComponent<CharacterController>();
+
+        _somethingIsMissing = false;
+        if(_canvasManager == null) { Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if(_controller == null) { Debug.LogWarning("Controller empty, FIX NOW!!!"); _somethingIsMissing = true; }
+    }
+
+    void Start()
+    {
+        LockCursor(); // Lock the cursor at the start    
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ToggleMode();
+        }
+
+        if (!isRotationMode)
+        {
+            MovePlayer();
+        }
+        
+        if (canRotate)
+        {
+            if (isRotationMode)
+                RotateObject();
+            else
+                RotatePlayer();
+        }
+    }
+
+    private void MovePlayer()
+    {
+        if (isRotationMode) return; // Prevent movement and gravity in rotation mode
+
+        float moveX = Input.GetAxis("Horizontal"); // A, D movement
+        float moveZ = Input.GetAxis("Vertical");   // W, S movement
+
+        Vector3 move = transform.right * moveX + transform.forward * moveZ;
+        _controller.Move(move * MoveSpeed * Time.deltaTime);
+
+        // Apply Gravity (only when not in rotation mode)
+        if (_controller.isGrounded && _velocity.y < 0)
+        {
+            _velocity.y = -2f;
+        }
+        _velocity.y += Gravity * Time.deltaTime;
+        _controller.Move(_velocity * Time.deltaTime);
+    }
+
+
+    void RotatePlayer()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
+
+        // Rotate player body horizontally
+        transform.Rotate(Vector3.up * mouseX);
+
+        // Rotate camera vertically (up/down)
+        _rotationX -= mouseY;
+        _rotationX = Mathf.Clamp(_rotationX, -90f, 90f); // Prevent flipping
+        cameraTransform.localRotation = Quaternion.Euler(_rotationX, 0f, 0f);
+    }
+
+    void RotateObject()
+    {
+        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
+
+        // Rotate entire object
+        transform.Rotate(Vector3.up * mouseX);  // Rotate left/right
+        transform.Rotate(Vector3.right * -mouseY); // Rotate up/down
+    }
+
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        canRotate = false; // Disable rotation
+    }
+
+    public void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        canRotate = true; // Enable rotation
+    }
+    
+    public void ToggleMode()
+    {
+        isRotationMode = !isRotationMode;
+
+        if (isRotationMode)
+        {
+            Debug.Log("Switched to Rotation Mode");
+            _controller.enabled = false;  // Disable CharacterController to prevent movement issues
+        }
+        else
+        {
+            Debug.Log("Switched to Movement Mode");
+            _controller.enabled = true;   // Re-enable CharacterController
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("01_LevelTrigger") && _canvasManager.Is_1_TriggerEnabled())
+        {
+            _canvasManager.Show_002_1_EventTriggerMessage();
+        }
+        else if (other.CompareTag("02_LevelTrigger") && _canvasManager.Is_2_TriggerEnabled())
+        {
+            _canvasManager.Show_002_2_EventTriggerMessage();
+        }
+        else if (other.CompareTag("03_LevelTrigger")  && _canvasManager.Is_3_TriggerEnabled())
+        {
+            _canvasManager.Show_002_3_EventTriggerMessage();
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("01_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_1_EventTriggerMessage();
+        }
+        else if (other.CompareTag("02_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_2_EventTriggerMessage();
+        }
+        else if (other.CompareTag("03_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_3_EventTriggerMessage();
+        }
+    }
 }
