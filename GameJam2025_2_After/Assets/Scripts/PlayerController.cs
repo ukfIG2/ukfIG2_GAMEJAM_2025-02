@@ -19,13 +19,15 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        _controller = GetComponent<CharacterController>();
+
         _somethingIsMissing = false;
         if(_canvasManager == null) {Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true;}
+        if(_controller == null) {Debug.LogWarning("Controller empty, FIX NOW!!!"); _somethingIsMissing = true;}
     }
 
     void Start()
     {
-        _controller = GetComponent<CharacterController>();
         LockCursor(); // Lock the cursor at the start    
     }
 
@@ -96,15 +98,15 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log(other.name);
-        if (other.CompareTag("01_LevelTrigger"))
+        if (other.CompareTag("01_LevelTrigger") && _canvasManager.Is_1_TriggerEnabled())
         {
             _canvasManager.Show_002_1_EventTriggerMessage();
         }
-        else if (other.CompareTag("02_LevelTrigger"))
+        else if (other.CompareTag("02_LevelTrigger") && _canvasManager.Is_2_TriggerEnabled())
         {
             _canvasManager.Show_002_2_EventTriggerMessage();
         }
-        else if (other.CompareTag("03_LevelTrigger"))
+        else if (other.CompareTag("03_LevelTrigger")  && _canvasManager.Is_3_TriggerEnabled())
         {
             _canvasManager.Show_002_3_EventTriggerMessage();
         }

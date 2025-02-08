@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioClip _001_IntroSound;
     ///001
     
+    ///002
+    [SerializeField] private GameObject _firstMiniGamePlayerPosition;
+    [SerializeField] private GameObject _TrashCan;
+    ///002    
+    
     //Start before creating the game
     void Awake()
     {
@@ -65,7 +70,12 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        //if _canvasManager._level_1_TriggerBeingShown && press E playFirstMinigame()
+        if (_canvasManager.Is_1_TriggerBeingShown() && Input.GetKeyDown(KeyCode.E))
+        {
+            /// 002
+            _002_PlayFirstMinigame();
+        }
     }
 
     /// 001
@@ -80,7 +90,15 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(6f); // Wait 5 seconds before starting
         _mainDoor.CloseDoor();
         _canvasManager.HideIntroText();
+        _canvasManager.EnableEventTrigger1();
     }
     /// 001
     
+    /// 002
+    private void _002_PlayFirstMinigame()
+    {
+        Debug.Log("First Minigame Shown");
+        _canvasManager.DisableEventTrigger1(); _canvasManager.Hide_002_1_EventTriggerMessage();
+    }   
+     /// 002
 }
