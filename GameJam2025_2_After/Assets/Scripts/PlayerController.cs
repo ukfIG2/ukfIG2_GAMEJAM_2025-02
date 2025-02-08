@@ -1,9 +1,12 @@
 using UnityEngine;
+using UnityEngine.Android;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField]    private const float MoveSpeed = 5f;
-    [SerializeField]    private const float MouseSensitivity = 2f;
+    private bool _somethingIsMissing;
+    [SerializeField]    CanvasManager _canvasManager;
+    private const float MoveSpeed = 1f;
+    private const float MouseSensitivity = 1f;
     private const float Gravity = -9.81f;
 
     private CharacterController _controller;
@@ -13,6 +16,12 @@ public class PlayerController : MonoBehaviour
     private bool canRotate = true; // Controls whether the player can rotate the camera
 
     [SerializeField]    private Transform cameraTransform;  // Assign the child camera in the Inspector
+
+    private void Awake()
+    {
+        _somethingIsMissing = false;
+        if(_canvasManager == null) {Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true;}
+    }
 
     void Start()
     {
@@ -83,5 +92,39 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         canRotate = true; // Enable rotation
     }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        //Debug.Log(other.name);
+        if (other.CompareTag("01_LevelTrigger"))
+        {
+            _canvasManager.Show_002_1_EventTriggerMessage();
+        }
+        else if (other.CompareTag("02_LevelTrigger"))
+        {
+            _canvasManager.Show_002_2_EventTriggerMessage();
+        }
+        else if (other.CompareTag("03_LevelTrigger"))
+        {
+            _canvasManager.Show_002_3_EventTriggerMessage();
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("01_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_1_EventTriggerMessage();
+        }
+        else if (other.CompareTag("02_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_2_EventTriggerMessage();
+        }
+        else if (other.CompareTag("03_LevelTrigger"))
+        {
+            _canvasManager.Hide_002_3_EventTriggerMessage();
+        }
+    }
+
 
 }
