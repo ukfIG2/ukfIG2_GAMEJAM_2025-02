@@ -12,6 +12,8 @@ public class Door : MonoBehaviour
     private Quaternion _openRotation;
     private bool _isOpening = false;
     private bool _isClosing = false;
+    private AudioSource _audioSource;
+
 
     private void Start()
     {
@@ -26,10 +28,24 @@ public class Door : MonoBehaviour
         {
             _openRotation = Quaternion.Euler(0, -_openAngle, 0) * _closedRotation;
         }
+        
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
     {
+        //if i pres q open door if i press e close the door
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            if (_isOpening)
+            {
+                CloseDoor();
+            }
+            else
+            {
+                OpenDoor();
+            }
+        }
         if (_isOpening)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, _openRotation, Time.deltaTime * _openSpeed);
@@ -56,6 +72,7 @@ public class Door : MonoBehaviour
     {
         _isOpening = true;
         _isClosing = false; // Ensure closing is stopped when opening
+        _audioSource.Play();
     }
 
     // Close the door smoothly
@@ -63,5 +80,6 @@ public class Door : MonoBehaviour
     {
         _isClosing = true;
         _isOpening = false; // Ensure opening is stopped when closing
+        _audioSource.Play();
     }
 }
