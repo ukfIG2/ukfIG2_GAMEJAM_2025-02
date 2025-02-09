@@ -9,6 +9,8 @@ TagManager:
   - 03_LevelTrigger
   - TrashCanTarget
   - GameManager
+  - 02_MiniGameObjectsToBeDestroyed
+  - 02_MiniGameGameObjectsToBeDisabled
   layers:
   - Default
   - TransparentFX

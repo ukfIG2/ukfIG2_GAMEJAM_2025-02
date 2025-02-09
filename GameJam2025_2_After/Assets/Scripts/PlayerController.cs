@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Android;
 
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isRotationMode = false; // Toggle between movement and rotation modes
 
     [SerializeField] private Transform cameraTransform;  // Assign the child camera in the Inspector
+    [SerializeField] private Boolean _stopMoving;
 
     private void Awake()
     {
@@ -41,6 +43,7 @@ public class PlayerController : MonoBehaviour
         if (_somethingIsMissing) { Application.Quit(); }
 
         currentShootForce = minShootForce; // Start at min force
+        _stopMoving = false;
     }
 
     void Start()
@@ -54,6 +57,7 @@ public class PlayerController : MonoBehaviour
         {
             ToggleMode();
         }*/
+        if (_stopMoving) return; // Prevent movement and gravity when stopped
 
         if (!isRotationMode)
         {
@@ -252,4 +256,17 @@ public class PlayerController : MonoBehaviour
         increasingForce = true;
     }
     /// for shooting
+
+    public void DisableRotation()
+    {
+        canRotate = false; // Prevent any rotation input
+        isRotationMode = false; // Ensure it's not in rotation mode
+        _rotationX = 0f; // Reset camera rotation
+        cameraTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        _stopMoving = true;
+        Debug.Log("Rotation fully disabled!");
+
+    }
+
+
 }
