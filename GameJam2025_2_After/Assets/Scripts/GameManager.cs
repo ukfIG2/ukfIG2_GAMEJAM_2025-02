@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<GameObject> _dynamicGameObjects = new List<GameObject>();
     private const int _papersTothrowToTrashcan = 5;
     [SerializeField] private int _papersInTrash;
+    [SerializeField] private GameObject _FirstMiniGameObject;
+    [SerializeField] private Boolean _sunAquired;
+    [SerializeField] private GameObject _firstMiniGameTrash;
 
     ///002    
     
@@ -62,11 +65,16 @@ public class GameManager : MonoBehaviour
         if(_001_IntroSound == null) {Debug.LogWarning("_001_IntroSound empty, FIX NOW!!!"); _somethingIsMissing = true;}
         if(_trashCan == null) {Debug.LogWarning("_trashCan empty, FIX NOW!!!"); _somethingIsMissing = true;}
         if(_player == null) {Debug.LogWarning("_player empty, FIX NOW"); _somethingIsMissing = true;}
+        if(_FirstMiniGameObject == null) {Debug.LogWarning("_firstMiniGameObject empty, FIX NOW"); _somethingIsMissing = true;}
+        if(_firstMiniGameTrash == null) {Debug.LogWarning("_firstMiniGameTrash empty, FIX NOW"); _somethingIsMissing = true;}
         if(_somethingIsMissing) {Application.Quit();}
         ///Checking if i have everithing set 
 
         /// 002
         _isPlayingFirstMiniGame = false;
+        _sunAquired = false; ///
+        _FirstMiniGameObject.SetActive(false);
+        _firstMiniGameTrash.SetActive(true);
 
 
     }
@@ -96,10 +104,13 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("FirstMision finished"); 
                 DestroyPaperBalls();
+                Destroy(_firstMiniGameTrash);
                 _isPlayingFirstMiniGame = false;
                 //change rotation to 0 0 0
                 _player.transform.rotation = Quaternion.Euler(0, 0, 0);
                 _player.gameObject.SendMessage("ToggleMode");
+                _FirstMiniGameObject.SetActive(true);
+                _canvasManager.EnableEventTrigger2();
             }
         }
     }
@@ -163,6 +174,12 @@ public class GameManager : MonoBehaviour
     public void RemoveFromList(GameObject paper)
     {
         _dynamicGameObjects.Remove(paper);
+    }
+
+    public void AquireSun()
+    {
+        _sunAquired = true;
+        Debug.Log("Sun Aquired");
     }
 
      /// 002
