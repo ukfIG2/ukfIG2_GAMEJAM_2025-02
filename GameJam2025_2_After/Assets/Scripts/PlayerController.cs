@@ -1,144 +1,21 @@
-/*using UnityEngine;
-using UnityEngine.Android;
-
-public class PlayerController : MonoBehaviour
-{
-    private bool _somethingIsMissing;
-    [SerializeField]    CanvasManager _canvasManager;
-    private const float MoveSpeed = 1f;
-    private const float MouseSensitivity = 1f;
-    private const float Gravity = -9.81f;
-
-    private CharacterController _controller;
-    private Vector3 _velocity;
-    private float _rotationX = 0f;
-
-    private bool canRotate = true; // Controls whether the player can rotate the camera
-
-    [SerializeField]    private Transform cameraTransform;  // Assign the child camera in the Inspector
-
-    private void Awake()
-    {
-        _controller = GetComponent<CharacterController>();
-
-        _somethingIsMissing = false;
-        if(_canvasManager == null) {Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true;}
-        if(_controller == null) {Debug.LogWarning("Controller empty, FIX NOW!!!"); _somethingIsMissing = true;}
-    }
-
-    void Start()
-    {
-        LockCursor(); // Lock the cursor at the start    
-    }
-
-    void Update()
-    {
-        MovePlayer();
-        
-        if (canRotate) {RotatePlayer();}
-
-        
-        // Press Q to lock the cursor and enable rotation
-        /*if (Input.GetKeyDown(KeyCode.Q))
-        {
-            LockCursor();
-        }
-        
-        // Press E to unlock the cursor and disable rotation
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            UnlockCursor();
-        }*/
- /*   }   
-
-    void MovePlayer()
-    {
-        float moveX = Input.GetAxis("Horizontal"); // A, D movement
-        float moveZ = Input.GetAxis("Vertical");   // W, S movement
-
-        Vector3 move = transform.right * moveX + transform.forward * moveZ;
-        _controller.Move(move * MoveSpeed * Time.deltaTime);
-
-        // Apply Gravity
-        if (_controller.isGrounded && _velocity.y < 0)
-        {
-            _velocity.y = -2f;
-        }
-        _velocity.y += Gravity * Time.deltaTime;
-        _controller.Move(_velocity * Time.deltaTime);
-    }
-
-    void RotatePlayer()
-    {
-        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
-
-        // Rotate player body horizontally
-        transform.Rotate(Vector3.up * mouseX);
-
-        // Rotate camera vertically (up/down)
-        _rotationX -= mouseY;
-        _rotationX = Mathf.Clamp(_rotationX, -90f, 90f); // Prevent flipping
-        cameraTransform.localRotation = Quaternion.Euler(_rotationX, 0f, 0f);
-    }
-
-    public void UnlockCursor()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        canRotate = false; // Disable rotation
-    }
-
-    // Function to lock the cursor and enable camera rotation
-    public void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-        canRotate = true; // Enable rotation
-    }
-    
-    private void OnTriggerEnter(Collider other)
-    {
-        //Debug.Log(other.name);
-        if (other.CompareTag("01_LevelTrigger") && _canvasManager.Is_1_TriggerEnabled())
-        {
-            _canvasManager.Show_002_1_EventTriggerMessage();
-        }
-        else if (other.CompareTag("02_LevelTrigger") && _canvasManager.Is_2_TriggerEnabled())
-        {
-            _canvasManager.Show_002_2_EventTriggerMessage();
-        }
-        else if (other.CompareTag("03_LevelTrigger")  && _canvasManager.Is_3_TriggerEnabled())
-        {
-            _canvasManager.Show_002_3_EventTriggerMessage();
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("01_LevelTrigger"))
-        {
-            _canvasManager.Hide_002_1_EventTriggerMessage();
-        }
-        else if (other.CompareTag("02_LevelTrigger"))
-        {
-            _canvasManager.Hide_002_2_EventTriggerMessage();
-        }
-        else if (other.CompareTag("03_LevelTrigger"))
-        {
-            _canvasManager.Hide_002_3_EventTriggerMessage();
-        }
-    }
-
-
-}
-*/
-
 using UnityEngine;
 using UnityEngine.Android;
 
 public class PlayerController : MonoBehaviour
 {
     private bool _somethingIsMissing;
-    [SerializeField]    CanvasManager _canvasManager;
+    [SerializeField] CanvasManager _canvasManager;
+
+    /// for shooting
+    [SerializeField] private GameObject projectilePrefab; // Assign in the Inspector
+    [SerializeField] private Transform shootPoint; // Empty GameObject at camera position
+    [SerializeField] private float minShootForce = 1f;  // Min force
+    [SerializeField] private float maxShootForce = 10f; // Max force
+    private float currentShootForce;
+    private bool increasingForce = true; // Toggle direction
+    private bool isCharging = false; // Track if we are holding LMB
+    /// for shooting
+
     private const float MoveSpeed = 1f;
     private const float MouseSensitivity = 1f;
     private const float Gravity = -9.81f;
@@ -147,8 +24,8 @@ public class PlayerController : MonoBehaviour
     private Vector3 _velocity;
     private float _rotationX = 0f;
 
-    private bool canRotate = true; // Controls whether the player can rotate the camera
-    private bool isRotationMode = false; // Toggle between movement and rotation modes
+    [SerializeField] private bool canRotate = true; // Controls whether the player can rotate the camera
+    [SerializeField] private bool isRotationMode = false; // Toggle between movement and rotation modes
 
     [SerializeField] private Transform cameraTransform;  // Assign the child camera in the Inspector
 
@@ -157,8 +34,13 @@ public class PlayerController : MonoBehaviour
         _controller = GetComponent<CharacterController>();
 
         _somethingIsMissing = false;
-        if(_canvasManager == null) { Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true; }
-        if(_controller == null) { Debug.LogWarning("Controller empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if (_canvasManager == null) { Debug.LogWarning("CanvasManager empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if (_controller == null) { Debug.LogWarning("Controller empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if (projectilePrefab == null) { Debug.LogWarning("ProjectilePrefab empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if (shootPoint == null) { Debug.LogWarning("ShootPoint empty, FIX NOW!!!"); _somethingIsMissing = true; }
+        if (_somethingIsMissing) { Application.Quit(); }
+
+        currentShootForce = minShootForce; // Start at min force
     }
 
     void Start()
@@ -168,23 +50,30 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Tab))
+        /*if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleMode();
-        }
+        }*/
 
         if (!isRotationMode)
         {
             MovePlayer();
         }
-        
+
         if (canRotate)
         {
             if (isRotationMode)
+            {
                 RotateObject();
+                HandleShooting();
+
+            }
             else
+            {
                 RotatePlayer();
+            }
         }
+
     }
 
     private void MovePlayer()
@@ -205,7 +94,6 @@ public class PlayerController : MonoBehaviour
         _velocity.y += Gravity * Time.deltaTime;
         _controller.Move(_velocity * Time.deltaTime);
     }
-
 
     void RotatePlayer()
     {
@@ -242,7 +130,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         canRotate = true; // Enable rotation
     }
-    
+
     public void ToggleMode()
     {
         isRotationMode = !isRotationMode;
@@ -259,7 +147,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("01_LevelTrigger") && _canvasManager.Is_1_TriggerEnabled())
@@ -270,7 +157,7 @@ public class PlayerController : MonoBehaviour
         {
             _canvasManager.Show_002_2_EventTriggerMessage();
         }
-        else if (other.CompareTag("03_LevelTrigger")  && _canvasManager.Is_3_TriggerEnabled())
+        else if (other.CompareTag("03_LevelTrigger") && _canvasManager.Is_3_TriggerEnabled())
         {
             _canvasManager.Show_002_3_EventTriggerMessage();
         }
@@ -291,4 +178,78 @@ public class PlayerController : MonoBehaviour
             _canvasManager.Hide_002_3_EventTriggerMessage();
         }
     }
+
+    /// for shooting
+    private void HandleShooting()
+    {
+        if (Input.GetMouseButton(0)) // Holding LMB
+        {
+            isCharging = true;
+            ChangeShootForce();
+        }
+
+        if (Input.GetMouseButtonUp(0)) // Released LMB
+        {
+            isCharging = false;
+            Shoot();
+        }
+    }
+
+    private void ChangeShootForce()
+    {
+        if (increasingForce)
+        {
+            currentShootForce += Time.deltaTime * 5f; // Adjust speed of force change
+            if (currentShootForce >= maxShootForce)
+            {
+                currentShootForce = maxShootForce;
+                increasingForce = false;
+            }
+        }
+        else
+        {
+            currentShootForce -= Time.deltaTime * 5f;
+            if (currentShootForce <= minShootForce)
+            {
+                currentShootForce = minShootForce;
+                increasingForce = true;
+            }
+        }
+
+        Debug.Log($"Charging: {currentShootForce}");
+    }
+
+    private void Shoot()
+    {
+        if (projectilePrefab == null || shootPoint == null)
+        {
+            Debug.LogWarning("Projectile prefab or shoot point is not set!");
+            return;
+        }
+
+        // Instantiate projectile at shoot point
+        GameObject projectile = Instantiate(projectilePrefab, shootPoint.position, Quaternion.identity);
+
+        // Get the shooting direction (camera forward + 10 degrees upwards)
+        Vector3 shootDirection = cameraTransform.forward;
+        shootDirection = Quaternion.Euler(10f, 0f, 0f) * shootDirection; // Add 10° upward tilt
+
+        // Apply force to the projectile
+        Rigidbody rb = projectile.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddForce(shootDirection * currentShootForce, ForceMode.Impulse);
+        }
+        else
+        {
+            Debug.LogWarning("Projectile does not have a Rigidbody!");
+        }
+
+        Debug.Log($"Shot fired with force: {currentShootForce}");
+
+        // Reset force for next shot
+        currentShootForce = minShootForce;
+        increasingForce = true;
+    }
+    /// for shooting
 }

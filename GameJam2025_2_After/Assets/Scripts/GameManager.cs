@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 
 public class GameManager : MonoBehaviour
@@ -23,6 +24,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject _firstMiniGamePlayerPosition;
     [SerializeField] private GameObject _trashCan;
     [SerializeField] private GameObject _player;
+    private Boolean _isPlayingFirstMiniGame;
+    //Dynamic list of gameObjects
+    [SerializeField] private List<GameObject> _dynamicGameObjects = new List<GameObject>();
+    private const int _papersTothrowToTrashcan = 5;
+    [SerializeField] private int _papersInTrash;
+
     ///002    
     
     
@@ -58,6 +65,8 @@ public class GameManager : MonoBehaviour
         if(_somethingIsMissing) {Application.Quit();}
         ///Checking if i have everithing set 
 
+        /// 002
+        _isPlayingFirstMiniGame = false;
 
 
     }
@@ -80,6 +89,19 @@ public class GameManager : MonoBehaviour
             /// 002
             _002_PlayFirstMinigame();
         }
+
+        if(_isPlayingFirstMiniGame)
+        {
+            if (_papersInTrash >= _papersTothrowToTrashcan)
+            {
+                Debug.Log("FirstMision finished"); 
+                DestroyPaperBalls();
+                _isPlayingFirstMiniGame = false;
+                //change rotation to 0 0 0
+                _player.transform.rotation = Quaternion.Euler(0, 0, 0);
+                _player.gameObject.SendMessage("ToggleMode");
+            }
+        }
     }
 
     /// 001
@@ -101,6 +123,7 @@ public class GameManager : MonoBehaviour
     /// 002
     private void _002_PlayFirstMinigame()
     {
+        _isPlayingFirstMiniGame = true;
         Debug.Log("First Minigame Shown");
         _canvasManager.DisableEventTrigger1(); 
         _canvasManager.Hide_002_1_EventTriggerMessage();
@@ -116,6 +139,30 @@ public class GameManager : MonoBehaviour
         // Ensure the player enters rotation mode (assuming ToggleMode switches between movement and rotation)
         _player.gameObject.SendMessage("ToggleMode");
 
+    }
+
+    public void AddPaperBallToList(GameObject paper)
+    {
+        _dynamicGameObjects.Add(paper);
+    }
+
+    public void DestroyPaperBalls()
+    {
+        foreach (var paperBall in _dynamicGameObjects)
+        {
+            Destroy(paperBall);
+        }
+        _dynamicGameObjects.Clear();
+    }
+
+    public void ThrowPapersToTrashCan()
+    {
+        _papersInTrash += 1;
+    }
+
+    public void RemoveFromList(GameObject paper)
+    {
+        _dynamicGameObjects.Remove(paper);
     }
 
      /// 002

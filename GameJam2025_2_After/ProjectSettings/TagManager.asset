@@ -8,6 +8,7 @@ TagManager:
   - 02_LevelTrigger
   - 03_LevelTrigger
   - TrashCanTarget
+  - GameManager
   layers:
   - Default
   - TransparentFX
