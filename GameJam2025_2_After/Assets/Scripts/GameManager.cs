@@ -204,6 +204,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Second Minigame Started");
         _isPlayingSecondMiniGame = true;
         _canvasManager.DisableEventTrigger2();
+        _canvasManager.EnableEventTrigger3();
         _canvasManager.Hide_002_2_EventTriggerMessage();
         _blanket.SetActive(false);
 
