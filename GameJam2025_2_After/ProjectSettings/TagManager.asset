@@ -11,6 +11,7 @@ TagManager:
   - GameManager
   - 02_MiniGameObjectsToBeDestroyed
   - 02_MiniGameGameObjectsToBeDisabled
+  - ClothesToCatch
   layers:
   - Default
   - TransparentFX

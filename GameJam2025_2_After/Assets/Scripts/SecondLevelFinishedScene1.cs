@@ -45,7 +45,7 @@ public class SecondLevelFinishedScene : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         // Step 3: Change Bear sprite to Bear2
-        _secondMiniText.text = "That you asshole from saving us from your trash. ";
+        _secondMiniText.text = "Thank you asshole for saving us from your trash. ";
 
         yield return new WaitForSeconds(5f);
 

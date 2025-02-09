@@ -2,6 +2,9 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
+
+
 
 public class GameManager : MonoBehaviour
 {
@@ -42,6 +45,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]    private GameObject _toDeletaAfterCompletion;
     
     /// 003
+    /// 004
+    [SerializeField] private Transform _insideForestPosition;
+    private int _clothesToCatch = 8;
+    [SerializeField] private int _remainingClothes;
+    private Boolean _isPlayingThirdMiniGame;
+    /// 004
 
     void Awake()
     {
@@ -81,6 +90,9 @@ public class GameManager : MonoBehaviour
         _gameObjectsDestroyed = 0;
         _secondMiniGameObject.SetActive(false);
         _keyAquired = false;
+
+        _remainingClothes = _clothesToCatch;
+        _isPlayingThirdMiniGame = false;
     }
 
     void Start()
@@ -131,6 +143,22 @@ public class GameManager : MonoBehaviour
                 Destroy(_toDeletaAfterCompletion);
             }
         }
+
+        if (_canvasManager.Is_3_TriggerBeingShown() && Input.GetKeyDown(KeyCode.E))
+        { 
+            _004_PlayThirdMinigame();
+        }
+
+        if (_isPlayingThirdMiniGame)
+        {
+            if (_remainingClothes <= 0)
+            {
+                Debug.Log("Third Mission finished");
+                //Change to scene "video"
+                SceneManager.LoadScene("Video");
+            }
+        }
+
     }
 
     /// 001
@@ -221,6 +249,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+ 
 private void CheckForObjectDestruction()
 {
     if (Input.GetMouseButtonDown(0)) // Left mouse button click
@@ -261,6 +290,25 @@ private void CheckForObjectDestruction()
     {
         _keyAquired = false;
         Debug.LogWarning("Key used");
+    }
+
+    private void _004_PlayThirdMinigame()
+    {
+        Debug.Log("Third Minigame Started");
+        KeyUsed();
+        _isPlayingThirdMiniGame = true;
+        _canvasManager.DisableEventTrigger3();
+        _canvasManager.Hide_002_3_EventTriggerMessage();
+        //move player to position of _insideForest
+        _player.transform.position = _insideForestPosition.transform.position;
+        _player.transform.rotation = Quaternion.Euler(0, 180, 0);
+        _player.gameObject.SendMessage("ChangeToForrestMode");
+    }
+
+    public void ClothCaught()
+    {
+        _remainingClothes -= 1;
+        Debug.Log("Cloth Caught");
     }
 
 }

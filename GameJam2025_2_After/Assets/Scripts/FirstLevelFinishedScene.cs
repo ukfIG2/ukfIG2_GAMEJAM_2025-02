@@ -58,7 +58,7 @@ public class FirstLevelFinishedScene : MonoBehaviour
 
         // Step 3: Change Bear sprite to Bear2
         ChangeSprite(_bear, _bearPoint);
-        _firstMiniText.text = "Thank you asshole from saving us from your trash. ";
+        _firstMiniText.text = "Thank you asshole for saving us from your trash. ";
         Debug.Log("Step 3: Changed Bear sprite to Bear2");
 
         yield return new WaitForSeconds(5f);

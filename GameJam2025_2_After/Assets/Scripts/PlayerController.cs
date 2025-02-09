@@ -5,7 +5,8 @@ using UnityEngine.Android;
 public class PlayerController : MonoBehaviour
 {
     private bool _somethingIsMissing;
-    [SerializeField] CanvasManager _canvasManager;
+    [SerializeField] private CanvasManager _canvasManager;
+    [SerializeField] private GameManager _gameManager;
 
     /// for shooting
     [SerializeField] private GameObject projectilePrefab; // Assign in the Inspector
@@ -17,8 +18,8 @@ public class PlayerController : MonoBehaviour
     private bool isCharging = false; // Track if we are holding LMB
     /// for shooting
 
-    private const float MoveSpeed = 1f;
-    private const float MouseSensitivity = 1f;
+    private  float _moveSpeed = 1f;
+    private  float _mouseSensitivity = 1f;
     private const float Gravity = -9.81f;
 
     private CharacterController _controller;
@@ -88,7 +89,7 @@ public class PlayerController : MonoBehaviour
         float moveZ = Input.GetAxis("Vertical");   // W, S movement
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
-        _controller.Move(move * MoveSpeed * Time.deltaTime);
+        _controller.Move(move * _moveSpeed * Time.deltaTime);
 
         // Apply Gravity (only when not in rotation mode)
         if (_controller.isGrounded && _velocity.y < 0)
@@ -101,8 +102,8 @@ public class PlayerController : MonoBehaviour
 
     void RotatePlayer()
     {
-        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity;
 
         // Rotate player body horizontally
         transform.Rotate(Vector3.up * mouseX);
@@ -115,8 +116,8 @@ public class PlayerController : MonoBehaviour
 
     void RotateObject()
     {
-        float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * _mouseSensitivity;
 
         // Rotate entire object
         transform.Rotate(Vector3.up * mouseX);  // Rotate left/right
@@ -164,6 +165,11 @@ public class PlayerController : MonoBehaviour
         else if (other.CompareTag("03_LevelTrigger") && _canvasManager.Is_3_TriggerEnabled())
         {
             _canvasManager.Show_002_3_EventTriggerMessage();
+        }
+        else if (other.CompareTag("ClothesToCatch"))
+        {
+            _gameManager.ClothCaught();
+            Destroy(other.gameObject);
         }
     }
 
@@ -276,6 +282,12 @@ public class PlayerController : MonoBehaviour
         _stopMoving = false;
         Debug.Log("Rotation fully enabled!");
 
+    }
+
+    private void ChangeToForrestMode()
+    {
+        _moveSpeed = 10;
+        _mouseSensitivity = 5;
     }
 
 
