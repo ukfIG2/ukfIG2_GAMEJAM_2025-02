@@ -37,6 +37,10 @@ public class GameManager : MonoBehaviour
     private bool _isPlayingSecondMiniGame = false;
     private int _gameObjectsToDestroy = 11;
     [SerializeField] private int _gameObjectsDestroyed;
+    [SerializeField] private GameObject _secondMiniGameObject;
+    private Boolean _keyAquired;
+    [SerializeField]    private GameObject _toDeletaAfterCompletion;
+    
     /// 003
 
     void Awake()
@@ -63,6 +67,7 @@ public class GameManager : MonoBehaviour
         if (_firstMiniGameTrash == null) { Debug.LogWarning("_firstMiniGameTrash empty, FIX NOW"); _somethingIsMissing = true; }
         if (_blanket == null) { Debug.LogWarning("_blanket empty, FIX NOW"); _somethingIsMissing = true; }
         if (_secondMiniGamePlayerPosition == null) { Debug.LogWarning("_secondMiniGamePlayerPosition empty, FIX NOW"); _somethingIsMissing = true; }
+        if (_secondMiniGameObject == null) { Debug.LogWarning("_secondMiniGameObject empty, FIX NOW"); _somethingIsMissing = true; }
         if (_somethingIsMissing) { Application.Quit(); }
         /// Checking if everything is set 
 
@@ -74,6 +79,8 @@ public class GameManager : MonoBehaviour
         _blanket.SetActive(true);
 
         _gameObjectsDestroyed = 0;
+        _secondMiniGameObject.SetActive(false);
+        _keyAquired = false;
     }
 
     void Start()
@@ -120,6 +127,8 @@ public class GameManager : MonoBehaviour
                 {
                     gameObj.GetComponent<Collider>().enabled = true;
                 }
+                _secondMiniGameObject.SetActive(true);
+                Destroy(_toDeletaAfterCompletion);
             }
         }
     }
@@ -183,6 +192,12 @@ public class GameManager : MonoBehaviour
         Debug.Log("Sun Acquired");
     }
 
+    public void SunStolen()
+    {
+        _sunAquired = false;
+        Debug.LogWarning("Sun Stolen");
+    }
+
     /// 003
     private void _003_PlaySecondMinigame()
     {
@@ -192,7 +207,7 @@ public class GameManager : MonoBehaviour
         _canvasManager.Hide_002_2_EventTriggerMessage();
         _blanket.SetActive(false);
 
-        _player.gameObject.SendMessage("ToggleMode");
+        //_player.gameObject.SendMessage("ToggleMode");
         _player.gameObject.SendMessage("UnlockCursor");
         _player.gameObject.SendMessage("DisableRotation");
 
@@ -235,5 +250,16 @@ private void CheckForObjectDestruction()
         }
     }
 }
+
+    public void KeyAquired()
+    {
+        _keyAquired = true;
+        Debug.Log("Key Acquired");
+    }
+    public void KeyUsed()
+    {
+        _keyAquired = false;
+        Debug.LogWarning("Key used");
+    }
 
 }

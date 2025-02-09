@@ -268,5 +268,15 @@ public class PlayerController : MonoBehaviour
 
     }
 
+        public void EnableRotation()
+    {
+        
+        _rotationX = 0f; // Reset camera rotation
+        cameraTransform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        _stopMoving = false;
+        Debug.Log("Rotation fully enabled!");
+
+    }
+
 
 }
