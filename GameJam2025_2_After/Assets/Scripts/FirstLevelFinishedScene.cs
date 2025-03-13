@@ -58,14 +58,14 @@ public class FirstLevelFinishedScene : MonoBehaviour
 
         // Step 3: Change Bear sprite to Bear2
         ChangeSprite(_bear, _bearPoint);
-        _firstMiniText.text = "Thank you asshole for saving us from your trash. ";
+        _firstMiniText.text = "Thank you adventurer for saving us from your trash. ";
         Debug.Log("Step 3: Changed Bear sprite to Bear2");
 
         yield return new WaitForSeconds(5f);
 
         // Step 4: Change Bear sprite to Bear5
         ChangeSprite(_bear, _bearWave1);
-        _firstMiniText.text = "As token of our gratitude take our SUN, and burn to HELL !!!";
+        _firstMiniText.text = "As token of our gratitude take our SUN.";
         Debug.Log("Step 4: Changed Bear sprite to Bear5");
 
         yield return new WaitForSeconds(5f);
